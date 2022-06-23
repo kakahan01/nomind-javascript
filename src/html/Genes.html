@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nomind</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+
+</head>
+<body class="bg-dark">
+
+    <div id="nav-holder"></div>
+    <script>
+        // navbar loader
+        var navholder = document.getElementById("nav-holder");
+
+        var req = new XMLHttpRequest();
+        req.open("GET", "nav", true);
+        req.onreadystatechange = function() {
+            if (req.readyState == 4 && req.status == 200) {
+                // load nav
+                navholder.innerHTML = req.responseText;
+            }
+        }
+        req.send();
+    </script>
+
+
+    <div class="d-flex flex-column justify-content-center align-items-center" style="min-height: 82vh !important;">
+        <form id="form" class="text-bg-dark text-center" style="width: 60% !important;">
+            <div class="mb-3 align-self-center">
+                <label for="genes" class="form-label">Enter Genes:</label>
+                <textarea type="text" name="genes" class="form-control bg-dark text-bg-dark" id="genes" rows="10"></textarea>
+            </div>
+            <div class="mb-3 align-self-center">
+                <select class="form-select bg-dark text-bg-dark" aria-label="Select type" id="type-select">
+                    <option value="not-selected" selected>Choose Type</option>
+                    <option value="3">NCBI</option>
+                    <option value="4">Ensembl</option>
+                    <option value="0">Approved Symbol</option>
+                </select>
+            </div>
+            <button type="button" id="submit-btn" class="btn btn-dark">Submit</button>
+        </form>
+
+        <div id="result-div" style="width: 60% !important;" hidden>
+            <table class="table table-dark table-striped table-bordered">
+                <thead>
+                    <tr class="table-dark text-center">
+                        <th class="table-dark" scope="col">Input</th>
+                        <th scope="col">Result</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+
+                </tbody>
+            </table>
+
+            <div class="text-center">
+                <a download="Genes.csv" href="data:text/plain;charset=utf-8,Error" id="csvbutton">Download CSV</a>
+                <button type="button" id="refresh" class="btn btn-dark align-self-center">Convert Again</button>
+            </div>
+        </div> 
+    </div>
+    
+    
+
+
+    <script>
+        var btn = document.getElementById("submit-btn");
+        var genes = document.getElementById("genes");
+        var select = document.getElementById("type-select");
+        var form = document.getElementById("form");
+        var tablebody = document.getElementById("table-body");
+        var resultdiv = document.getElementById("result-div");
+        var refresh = document.getElementById("refresh");
+        var csvbutton = document.getElementById("csvbutton");
+
+        var genes_cache = [];
+
+        btn.onclick = function() {
+            var request = new XMLHttpRequest();
+            request.open("POST", "submit_genes", true);
+            request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+            let genes_text = genes.value;
+            let select_val = select.value;
+
+            genes_cache = genes_text.split("\n");
+
+            request.send(JSON.stringify({ genes: genes_text, type: select_val }));
+
+            request.onreadystatechange = function() {
+                if (request.readyState == 4 && request.status == 200) {
+                    // alert(request.responseText);
+                    form.remove();
+                    resultdiv.hidden = false;
+
+                    var result = JSON.parse(request.responseText);
+
+                    var csv = "";
+
+                    for (let i = 0; i < result.length; i++) {
+                        const gene = result[i];
+                        createTableElement(gene.split(","), i);
+
+                        if (gene == "not-found" || gene == "empty")
+                            continue;
+
+                        csv += genes_cache[i] + "," + gene.split(",").join("|") + "\n";
+                    }
+
+                    csvbutton.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(csv));
+
+                } else if (request.readyState == 4 && request.status != 200) {
+                    alert(request.responseText == "select-type" ? "Please select a type" : "Unknown error");
+                }
+            }
+        }
+
+        function createTableElement(gene, i) {
+            var tr = document.createElement("tr");
+            let inputTd = document.createElement("td");
+            inputTd.innerText = genes_cache[i];
+            let resultTd = document.createElement("td");
+            resultTd.innerText = gene.join(", ");
+
+            inputTd.style = "width: 50% !important;";
+            resultTd.style = "width: 50% !important;";
+
+            if (gene == "not-found")
+                resultTd.innerText = "Not found";
+            if (gene == "empty")
+                resultTd.innerText = "Input empty";
+
+            tr.append(inputTd);
+            tr.append(resultTd);
+
+            tablebody.append(tr);
+        }
+
+        refresh.onclick = function() {
+            location.reload();
+        }
+
+    </script>
+
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+</body>
+</html>

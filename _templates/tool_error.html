@@ -1,0 +1,21 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+ <div class="jumbotron text-justify", style="margin-bottom : 0px">
+    <h2>Multiple Genes</h2>
+    <p class="lead">Converts a gene list to a desired format</p>
+    <h3>{{error}}</h3>
+<form method="POST">
+    <textarea name="gene" rows="10" cols="30" placeholder="Write gene names"></textarea><br>
+ 
+  <input type="radio" name="nom" value="ncbi" > NCBI
+  <input type="radio" name="nom" value="ensemble"> Ensembl
+  <input type="radio" name="nom" value="symbol"> Approved Symbol<br><br>
+  <input type="checkbox" name="down" value="yes"> Download .csv file<br>
+    <input type="checkbox" name="inc" value="inc"> Include problematic names in the converted list<br>
+
+  <input type="submit" value="Submit"><br>
+</form>   
+  </div>
+{% endblock %}
+

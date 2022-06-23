@@ -6,3 +6,5 @@ genefinder.db
 symbol.db
 
 hugo.txt
+
+/node_modules

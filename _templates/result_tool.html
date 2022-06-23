@@ -1,0 +1,121 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+ <div class="jumbotron text-center", style="margin-bottom : 0px">
+    
+      <table class="table">
+  <thead>
+    <th><a href="/download"</a>{{link}}</th>
+  </thead>
+  </table>
+      
+
+    <table class="table">
+    <thead>
+      <tr>
+      <th>INPUT</th>
+        <th>CONVERTED TO {{nomination}}</th>
+        
+
+      </tr>
+      <style>
+          ul {
+  list-style-type: none;
+  text-align: left;
+  padding:0;
+}
+      </style>
+            <style>
+          th {
+  list-style-type: none;
+  text-align: left;
+}
+      </style>
+    </thead>
+    <tbody>
+      <tr>
+          
+    
+            <td>    <ul>
+    {% for user in geneb %}
+      <li>{{ user }}</li>
+    {% endfor %}
+    </ul> </td>
+    
+
+        <td>    <ul>
+    {% for user in genem %}
+      <li>{{ user }}</li>
+    {% endfor %}
+    </ul> </td>
+
+    </tr>
+    </tr>
+    </tbody>
+  </table>
+  </div>
+   <div class="jumbotron text-center", style="margin-bottom : 0px">
+    
+      <table class="table">
+  <thead>
+
+  </thead>
+  </table>
+    <table class="table">
+    <thead>
+      <tr>
+         <th>PROBLEMATICS</th>   
+        <th>APPROVED SYMBOLS</th>
+        <th>PROBLEMS</th>
+      
+        
+
+
+      </tr>
+      <style>
+          ul {
+  list-style-type: none;
+  text-align: left;
+  padding:0;
+}
+      </style>
+            <style>
+          th {
+  list-style-type: none;
+  text-align: left;
+}
+      </style>
+    </thead>
+    <tbody>
+      <tr>            <td>    <ul>
+    {% for user in genep %}
+      <li>{{ user }}</li>
+    {% endfor %}
+    </ul> </td>
+    
+                <td>    <ul>
+                 
+    {% for user in symboln  %}
+     {% if user != "None" %}
+     <li><a href="https://www.genecards.org/cgi-bin/carddisp.pl?gene={{user}}"   </a>{{user}}</li> 
+     {% else %}
+     <li><a  style="pointer-events: none; cursor: default;"  </a>{{user}}</li> 
+     {% endif %}
+    {% endfor %}
+ </ul> </td>
+        <td>    <ul>
+    {% for user in prob %}
+      <li>{{ user }}</li>
+    {% endfor %}
+    </ul> </td>
+    
+    
+
+    </tr>
+    </tr>
+    </tbody>
+  </table>
+  </div>
+
+{% endblock %}
+
