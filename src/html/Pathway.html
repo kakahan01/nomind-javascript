@@ -51,7 +51,7 @@
     <div class="d-flex flex-column justify-content-center align-items-center" style="min-height: 100vh !important;">
         <form class="w-50 mb-5" autocomplete="on" id="main-form">
             <label for="molecule" class="form-label text-white">Molecule:</label>
-            <input type="text" id="molecule" class="form-control">
+            <input type="text" id="molecule" class="form-control" placeholder="Enter molecule name and press Enter.">
         </form>
         
         <div id="visible-div" style="display:flex;overflow: auto;max-height: 15rem;flex-direction: column;align-items: center;align-self: center;align-content: center;">
@@ -90,6 +90,7 @@
         var download = document.getElementById("download");
 
         var cache = [];
+        var _search = "";
 
         refresh.onclick = function() {
             location.reload();
@@ -101,9 +102,15 @@
             var request = new XMLHttpRequest();
             request.open("GET", "/api/find/" + encodeURIComponent(input.value));
 
+            search = input.value;
+            input.value = "Loading...";
+            input.disabled = true;
+
             request.onreadystatechange = function() {
                 if (request.readyState == 4 && request.status == 200) {
                     table.innerHTML = "";
+                    input.value = search;
+                    input.disabled = false;
                     createTableElements(request.responseText);
                 }
             }
