@@ -164,7 +164,9 @@ app.post("/submit_genes", jsonParser, (req, res) => {
     res.send(JSON.stringify(found));
 });
 
-app.listen(5000, () => {
-    console.log("Server started at port 5000");
+const PORT = 80;
+
+app.listen(PORT, () => {
+    console.log("Server started at port " + PORT);
     genes = search("./hugo.txt");
 })
