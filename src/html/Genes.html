@@ -55,7 +55,25 @@
 
                 </tbody>
             </table>
+            <table class="table table-dark table-striped table-bordered">
+                <thead>
+                    <tr class="table-dark text-center">
+                        <th class="table-dark" scope="col">Problematic</th>
+                        <th scope="col">Problem</th>
+                    </tr>
+                </thead>
+                <tbody id="problem-body">
 
+                </tbody>
+            </table>
+
+            <div class="text-center">
+                <input class="form-check-input text-bg-dark bg-dark" type="checkbox" value="" id="csv-type">
+                <label class="form-check-label text-bg-dark" for="csv-type">
+                  Include input in CSV
+                </label>    
+            </div>
+    
             <div class="text-center">
                 <a download="Genes.csv" href="data:text/plain;charset=utf-8,Error" id="csvbutton">Download CSV</a>
                 <button type="button" id="refresh" class="btn btn-dark align-self-center">Convert Again</button>
@@ -72,11 +90,34 @@
         var select = document.getElementById("type-select");
         var form = document.getElementById("form");
         var tablebody = document.getElementById("table-body");
+        var problembody = document.getElementById("problem-body");
         var resultdiv = document.getElementById("result-div");
         var refresh = document.getElementById("refresh");
         var csvbutton = document.getElementById("csvbutton");
+        var csvtype = document.getElementById("csv-type");
 
         var genes_cache = [];
+        var result_genes = [];
+
+        var csv_input = csvtype.checked;
+
+        csvtype.onchange = function() {
+            csv_input = csvtype.checked;
+
+            var csv = "";
+
+            for (let i = 0; i < result_genes.length; i++) {
+                const gene = result_genes[i]
+                if (gene == "not-found" || gene == "empty")
+                    continue
+                if (csv_input)
+                    csv += genes_cache[i] + "," + gene.split(",").join("|") + "\n";
+                else
+                    csv += gene.split(",").join("|") + "\n";
+            }
+
+            csvbutton.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(csv));
+        }
 
         btn.onclick = function() {
             var request = new XMLHttpRequest();
@@ -97,6 +138,7 @@
                     resultdiv.hidden = false;
 
                     var result = JSON.parse(request.responseText);
+                    result_genes = result;
 
                     var csv = "";
 
@@ -107,7 +149,10 @@
                         if (gene == "not-found" || gene == "empty")
                             continue;
 
-                        csv += genes_cache[i] + "," + gene.split(",").join("|") + "\n";
+                        if (csv_input)
+                            csv += genes_cache[i] + "," + gene.split(",").join("|") + "\n";
+                        else
+                            csv += gene.split(",").join("|") + "\n";
                     }
 
                     csvbutton.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(csv));
@@ -132,11 +177,15 @@
                 resultTd.innerText = "Not found";
             if (gene == "empty")
                 resultTd.innerText = "Input empty";
-
+            
             tr.append(inputTd);
             tr.append(resultTd);
 
-            tablebody.append(tr);
+            if (gene == "not-found" || gene == "empty") {
+                problembody.append(tr);
+            } else {
+                tablebody.append(tr);
+            }
         }
 
         refresh.onclick = function() {
