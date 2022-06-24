@@ -5,9 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nomind</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <style>
+        .background {
+            background: url("/img/background.jpg");
+            background-repeat: round;
+            filter:brightness(30%);
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0px;
+            left: 0px;
+            z-index: -1;
+        }
 
+        .form-bg {
+            padding: 20px;
+            color: white;
+        }
+
+        textarea,select,button {
+            background: white !important;
+            color: black !important;
+            border: none !important;
+            filter: opacity(80%);
+        }
+
+
+    </style>
 </head>
-<body class="bg-dark">
+<body>
 
     <div id="nav-holder"></div>
     <script>
@@ -26,21 +52,26 @@
     </script>
 
 
-    <div class="d-flex flex-column justify-content-center align-items-center" style="min-height: 82vh !important;">
-        <form id="form" class="text-bg-dark text-center" style="width: 60% !important;">
-            <div class="mb-3 align-self-center">
+    <div class="background"></div>
+
+    <div class="d-flex flex-column justify-content-center align-items-center" style="min-height: 100vh !important;">
+        <form id="form" class="text-center form-bg mt-5" style="width: 60% !important;">
+            <div class="mb-3 align-self-center mt-3">
                 <label for="genes" class="form-label">Enter Genes:</label>
-                <textarea type="text" name="genes" class="form-control bg-dark text-bg-dark" id="genes" rows="10"></textarea>
+                <textarea type="text" name="genes" class="form-control" id="genes" rows="8"></textarea>
+                <label for="symbol" class="form-label">Enter References:</label>
+                <textarea type="text" name="symbol" class="form-control" id="symbol" rows="8"></textarea>
             </div>
             <div class="mb-3 align-self-center">
-                <select class="form-select bg-dark text-bg-dark" aria-label="Select type" id="type-select">
+                <select class="form-select" aria-label="Select type" id="type-select">
                     <option value="not-selected" selected>Choose Type</option>
-                    <option value="3">NCBI</option>
-                    <option value="4">Ensembl</option>
-                    <option value="0">Approved Symbol</option>
+                    <option value="NCBI">NCBI</option>
+                    <option value="ENSEMBL">Ensembl</option>
+                    <option value="SYMBOL">Approved Symbol</option>
+                    <option value="SYNONYMS">Symbol/Synonyms</option>
                 </select>
             </div>
-            <button type="button" id="submit-btn" class="btn btn-dark">Submit</button>
+            <button type="button" id="submit-btn" class="btn btn-light border">Submit</button>
         </form>
 
         <div id="result-div" style="width: 60% !important;" hidden>
@@ -70,7 +101,7 @@
             <div class="text-center">
                 <input class="form-check-input text-bg-dark bg-dark" type="checkbox" value="" id="csv-type">
                 <label class="form-check-label text-bg-dark" for="csv-type">
-                  Include input in CSV
+                  Include inputs in CSV
                 </label>    
             </div>
     
@@ -87,6 +118,7 @@
     <script>
         var btn = document.getElementById("submit-btn");
         var genes = document.getElementById("genes");
+        var references = document.getElementById("symbol");
         var select = document.getElementById("type-select");
         var form = document.getElementById("form");
         var tablebody = document.getElementById("table-body");
@@ -126,10 +158,11 @@
 
             let genes_text = genes.value;
             let select_val = select.value;
+            var symbols = symbol.value;
 
             genes_cache = genes_text.split("\n");
 
-            request.send(JSON.stringify({ genes: genes_text, type: select_val }));
+            request.send(JSON.stringify({ genes: genes_text, type: select_val, symbols: symbols }));
 
             request.onreadystatechange = function() {
                 if (request.readyState == 4 && request.status == 200) {

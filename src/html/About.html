@@ -5,9 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nomind</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <style>
+        .background {
+            background: url("/img/background.jpg");
+            background-repeat: round;
+            filter:brightness(30%);
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0px;
+            left: 0px;
+            z-index: -1;
+        }
 
+        h1,h2,h5,h6 {
+            color: white !important;
+        }
+    </style>
 </head>
-<body class="bg-dark">
+<body>
 
     <div id="nav-holder"></div>
     <script>
@@ -25,10 +41,13 @@
         req.send();
     </script>
 
+    <div class="background"></div>
 
     <div class="d-flex flex-column justify-content-center align-items-center" style="min-height: 82vh !important;">
-        <h1 class="text-bg-dark">Tan Umut Kaynar</h1>
-        <h2 class="text-bg-dark">tukaynar@gmail.com</h2>
+        <h5>This webpage and tools were developed for CICEKLAB by</h3>
+        <h2>Tan Umut Kaynar</h1>
+        <h6>github.com/tankaynar</h6>
+        <h6>tankaynar@gmail.com</h6>
     </div>
 
     
