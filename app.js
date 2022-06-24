@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 
+const fetch = require('node-fetch');
 const fs = require('fs');
 
 var bodyParser = require('body-parser');
@@ -30,6 +31,25 @@ app.get("/:redirect", (request, response) => {
         response.sendFile(path);
     else
         response.status(404).send("Not found.");
+})
+
+app.get("/pathway/:molecule", (req, res) => {
+    fetch("https://rest.kegg.jp/get/" + req.params.molecule)
+    .then(response => response.text())
+    .then(body => res.status(200).send(body));
+})
+
+app.get("/api/:func/:input", (req, res) => {
+    switch (req.params.func) {
+        case "find":
+            fetch("https://rest.kegg.jp/find/compound/" + req.params.input)
+            .then(response => response.text())
+            .then(body => res.status(200).send(body));
+            break;
+    
+        default:
+            break;
+    }
 })
 
 app.get("/img/:img_name", (req, res) => {

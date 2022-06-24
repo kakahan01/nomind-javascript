@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nomind</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <style>
+        .background {
+            background: url("/img/background.jpg");
+            background-repeat: round;
+            filter:brightness(30%);
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0px;
+            left: 0px;
+            z-index: -1;
+        }
+
+        div::-webkit-scrollbar {
+            display: none;
+        }
+
+        div {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="nav-holder"></div>
+    <script>
+        // navbar loader
+        var navholder = document.getElementById("nav-holder");
+
+        var req = new XMLHttpRequest();
+        req.open("GET", "nav", true);
+        req.onreadystatechange = function() {
+            if (req.readyState == 4 && req.status == 200) {
+                // load nav
+                navholder.innerHTML = req.responseText;
+            }
+        }
+        req.send();
+    </script>
+
+    <div class="background"></div>
+
+    <div class="d-flex flex-column justify-content-center align-items-center" style="min-height: 100vh !important;">
+        <form class="w-50 mb-5" autocomplete="on" id="main-form">
+            <label for="molecule" class="form-label text-white">Molecule:</label>
+            <input type="text" id="molecule" class="form-control">
+        </form>
+        
+        <div id="visible-div" style="display:flex;overflow: auto;max-height: 15rem;flex-direction: column;align-items: center;align-self: center;align-content: center;">
+            <table class="table table-light table-striped table-borderless" style="width: 50%;">
+                <tbody id="table-body">
+
+                </tbody>
+            </table>
+        </div>
+
+        <div hidden id="hidden-div" style="display:flex;overflow: auto;max-height: 30rem;flex-direction: column;align-items: center;align-self: center;align-content: center;width: 100%;">
+            <table class="table table-light table-striped table-bordered" style="width: 80%;">
+                <thead>
+                    <tr class="table-light text-center">
+                        <th class="table-light" scope="col">Results</th>
+                    </tr>
+                </thead>
+                <tbody id="result-body">
+
+                </tbody>
+            </table>       
+        </div>
+        <button type="button" id="refresh" class="btn btn-light mt-5" hidden>Again</button>
+    </div>
+
+
+    <script>
+        var form = document.getElementById("main-form");
+        var input = document.getElementById("molecule");
+        var table = document.getElementById("table-body");
+        var result_table = document.getElementById("result-body");
+        var hidden_div = document.getElementById("hidden-div");
+        var visible_div = document.getElementById("visible-div");
+        var refresh = document.getElementById("refresh");
+
+        var cache = [];
+
+        refresh.onclick = function() {
+            location.reload();
+        }
+
+        form.onsubmit = function(e) {
+            e.preventDefault();
+
+            var request = new XMLHttpRequest();
+            request.open("GET", "/api/find/" + encodeURIComponent(input.value));
+
+            request.onreadystatechange = function() {
+                if (request.readyState == 4 && request.status == 200) {
+                    table.innerHTML = "";
+                    createTableElements(request.responseText);
+                }
+            }
+
+            request.send();
+        }
+
+        function createTableElements(result) {
+            var compounds = result.split("\n");
+            cache = compounds;
+            for (let i = 0; i < compounds.length; i++) {
+                const compound = compounds[i];
+                let tr = document.createElement("tr");
+                let td = document.createElement("td");
+                let a = document.createElement("a");
+                tr.append(td);
+                td.append(a);
+                let split = compound.split("	");
+                split.splice(0,1);
+                a.innerText = split.join("	");
+                a.style = "cursor:pointer;color:blue;"
+                let name = compound.split("	").splice(0,1).join("");
+                a.onclick = function() {
+                    var req = new XMLHttpRequest();
+                    req.open("GET", "/pathway/" + name, true);
+                    req.onreadystatechange = function() {
+                        if (req.readyState == 4 && req.status == 200) {
+                            visible_div.remove();
+                            hidden_div.hidden = false;
+                            form.remove();
+                            refresh.hidden = false;
+
+                            let results = parseResults(req.responseText);
+                            createResultElements(results);
+                        }
+                    }
+                    req.send();
+                }
+
+                table.append(tr);
+            }
+        }
+
+        function createResultElements(results) {
+            for (let i = 0; i < results.length; i++) {
+                const result = results[i];
+                let tr = document.createElement("tr");
+                let td = document.createElement("td");
+                td.innerText = result;
+                tr.append(td);
+                result_table.append(tr);
+            }
+        }
+
+        function parseResults(results) {
+            var lines = results.split("\n");
+            var start_line = 0;
+            var end_line = 0;
+
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+                // console.log(line);
+                if (line.startsWith("PATHWAY")) {
+                    start_line = i;
+                    continue;
+                }
+                
+                if (start_line != 0 && end_line == 0 && !line.startsWith(" ")) {
+                    end_line = i;
+                    break;
+                }
+            }
+
+            console.log(start_line);
+
+            var ways = [];
+
+            var req_lines = lines.splice(start_line, end_line - start_line);
+            for (let i = 0; i < req_lines.length; i++) {
+                const line = req_lines[i];
+                let way = line.split("map")[1].split("  ")[1];
+                ways.push(way);
+            }
+
+            return ways;
+        }
+    </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+</body>
+</html>
