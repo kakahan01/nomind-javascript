@@ -74,7 +74,8 @@
                 </tbody>
             </table>       
         </div>
-        <button type="button" id="refresh" class="btn btn-light mt-5" hidden>Again</button>
+        <a id="download" class="text-white mt-2" hidden>Download</a>
+        <button type="button" id="refresh" class="btn btn-light mt-2" hidden>Again</button>
     </div>
 
 
@@ -86,6 +87,7 @@
         var hidden_div = document.getElementById("hidden-div");
         var visible_div = document.getElementById("visible-div");
         var refresh = document.getElementById("refresh");
+        var download = document.getElementById("download");
 
         var cache = [];
 
@@ -133,9 +135,12 @@
                             hidden_div.hidden = false;
                             form.remove();
                             refresh.hidden = false;
+                            download.hidden = false;
 
                             let results = parseResults(req.responseText);
                             createResultElements(results);
+                            download.setAttribute("download", split.join("  ").split(";")[0] + ".txt");
+                            download.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(results.join("\n")));
                         }
                     }
                     req.send();
