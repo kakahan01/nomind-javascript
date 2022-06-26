@@ -17,15 +17,6 @@
             left: 0px;
             z-index: -1;
         }
-
-        div::-webkit-scrollbar {
-            display: none;
-        }
-
-        div {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
     </style>
 </head>
 <body>
@@ -59,16 +50,16 @@
             <input type="text" id="molecule" class="form-control" placeholder="Enter name and press Enter.">
         </form>
         
-        <div id="visible-div" style="display:flex;overflow: auto;max-height: 15rem;flex-direction: column;align-items: center;align-self: center;align-content: center;">
-            <table class="table table-light table-striped table-borderless" style="width: 80%;">
+        <div id="visible-div" style="display:flex;overflow: auto;max-height: 15rem;flex-direction: column;align-items: center;align-self: center;align-content: center;width: 80%;">
+            <table class="table table-light table-striped table-borderless">
                 <tbody id="table-body">
 
                 </tbody>
             </table>
         </div>
 
-        <div hidden id="hidden-div" style="display:flex;overflow: auto;max-height: 30rem;flex-direction: column;align-items: center;align-self: center;align-content: center;width: 100%;">
-            <table class="table table-light table-striped table-bordered" style="width: 80%;">
+        <div hidden id="hidden-div" style="display:flex;overflow: auto;max-height: 30rem;flex-direction: column;align-items: center;align-self: center;align-content: center;width: 80%;">
+            <table class="table table-light table-striped table-bordered">
                 <thead>
                     <tr class="table-light text-center">
                         <th class="table-light" scope="col">Results</th>
