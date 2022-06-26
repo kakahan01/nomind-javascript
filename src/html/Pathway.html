@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nomind</title>
+    <title>CICEKLAB Tools</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
     <style>
         .background {
@@ -50,12 +50,17 @@
 
     <div class="d-flex flex-column justify-content-center align-items-center" style="min-height: 100vh !important;">
         <form class="w-50 mb-5" autocomplete="on" id="main-form">
-            <label for="molecule" class="form-label text-white">Molecule:</label>
-            <input type="text" id="molecule" class="form-control" placeholder="Enter molecule name and press Enter.">
+            <label for="type-select" class="form-label text-white mt-2">Choose:</label>
+            <select class="form-select" aria-label="Choose" id="type-select">
+                <option value="topathway">Metabolite to Pathway</option>
+                <option value="toprocess">Pathway to Process</option>
+            </select>
+            <label for="molecule" class="form-label text-white">Molecule or Pathway:</label>
+            <input type="text" id="molecule" class="form-control" placeholder="Enter name and press Enter.">
         </form>
         
         <div id="visible-div" style="display:flex;overflow: auto;max-height: 15rem;flex-direction: column;align-items: center;align-self: center;align-content: center;">
-            <table class="table table-light table-striped table-borderless" style="width: 50%;">
+            <table class="table table-light table-striped table-borderless" style="width: 80%;">
                 <tbody id="table-body">
 
                 </tbody>
@@ -88,6 +93,7 @@
         var visible_div = document.getElementById("visible-div");
         var refresh = document.getElementById("refresh");
         var download = document.getElementById("download");
+        var select = document.getElementById("type-select");
 
         var cache = [];
         var _search = "";
@@ -99,23 +105,119 @@
         form.onsubmit = function(e) {
             e.preventDefault();
 
-            var request = new XMLHttpRequest();
-            request.open("GET", "/api/find/" + encodeURIComponent(input.value));
+            console.log(select.value);
 
-            search = input.value;
-            input.value = "Loading...";
-            input.disabled = true;
+            if (select.value == "topathway") {
+                var request = new XMLHttpRequest();
+                request.open("GET", "/api/find/" + encodeURIComponent(input.value), true);
 
-            request.onreadystatechange = function() {
-                if (request.readyState == 4 && request.status == 200) {
-                    table.innerHTML = "";
-                    input.value = search;
-                    input.disabled = false;
-                    createTableElements(request.responseText);
+                search = input.value;
+                input.value = "Loading...";
+                input.disabled = true;
+
+                request.onreadystatechange = function() {
+                    if (request.readyState == 4 && request.status == 200) {
+                        table.innerHTML = "";
+                        input.value = search;
+                        input.disabled = false;
+                        createTableElements(request.responseText);
+                    }
                 }
+
+                request.send();
+            } else if (select.value == "toprocess") {
+                var request = new XMLHttpRequest();
+                request.open("GET", "/api/findpathway/" + encodeURIComponent(input.value), true);
+
+                search = input.value;
+                input.value = "Loading...";
+                input.disabled = true;
+
+                request.onreadystatechange = function() {
+                    if (request.readyState == 4 && request.status == 200) {
+                        table.innerHTML = "";
+                        input.value = search;
+                        input.disabled = false;
+                        createTablePathway(request.responseText);
+                    }
+                }
+
+                request.send();
             }
 
-            request.send();
+
+        }
+
+        function createTablePathway(result) {
+            var lines = result.split("\n");
+            cache = [];
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+                if (line.trim() == "")
+                    continue;
+                let id = line.split(":")[1].split("	")[0];
+                let name = line.split("	")[1];
+
+                cache.push(id);
+
+                let tr = document.createElement("tr");
+                let td = document.createElement("td");
+                let a = document.createElement("a");
+                tr.append(td);
+                td.append(a);
+                
+                a.innerText = name;
+                a.style = "cursor:pointer;color:blue;";
+
+                a.onclick = function() {
+                    var req = new XMLHttpRequest();
+                    req.open("GET", "/api/get/" + encodeURIComponent(id), true);
+
+                    req.onreadystatechange = function() {
+                        if (req.readyState == 4 && req.status == 200) {
+                            visible_div.remove();
+                            hidden_div.hidden = false;
+                            form.remove();
+                            refresh.hidden = false;
+                            download.hidden = false;
+
+                            let result = parseProcess(req.responseText);
+                            console.log(result);
+                            createProcessElement(result);
+                            download.setAttribute("download", name + ".txt");
+                            download.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(result));
+                        }
+                    }
+
+                    req.send();
+                }
+
+                table.append(tr);
+            }
+        }
+
+        function parseProcess(result) {
+            var lines = result.split("\n");
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+                if (line.startsWith("CLASS")) {
+                    console.log(line);
+                    return line.split("       ")[1];
+                }
+            }
+        }
+
+        function createProcessElement(result) {
+            var res = result.split("; ");
+            for (let i = 0; i < res.length; i++) {
+                const r = res[i];
+                let tr = document.createElement("tr");
+                let td = document.createElement("td");
+                td.innerText = r;
+                tr.append(td);
+                result_table.append(tr);
+            }
+
         }
 
         function createTableElements(result) {
@@ -135,7 +237,7 @@
                 let name = compound.split("	").splice(0,1).join("");
                 a.onclick = function() {
                     var req = new XMLHttpRequest();
-                    req.open("GET", "/pathway/" + name, true);
+                    req.open("GET", "/api/get/" + encodeURIComponent(name), true);
                     req.onreadystatechange = function() {
                         if (req.readyState == 4 && req.status == 200) {
                             visible_div.remove();
@@ -148,6 +250,9 @@
                             createResultElements(results);
                             download.setAttribute("download", split.join("  ").split(";")[0] + ".txt");
                             download.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(results.join("\n")));
+                        } else if (req.readyState == 4 && req.status != 200) {
+                            alert("Unknown error.");
+                            location.reload();
                         }
                     }
                     req.send();

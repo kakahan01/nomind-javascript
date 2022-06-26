@@ -33,20 +33,35 @@ app.get("/:redirect", (request, response) => {
         response.status(404).send("Not found.");
 })
 
-app.get("/pathway/:molecule", (req, res) => {
-    fetch("https://rest.kegg.jp/get/" + req.params.molecule)
-    .then(response => response.text())
-    .then(body => res.status(200).send(body));
-})
-
 app.get("/api/:func/:input", (req, res) => {
     switch (req.params.func) {
         case "find":
             fetch("https://rest.kegg.jp/find/compound/" + req.params.input)
             .then(response => response.text())
-            .then(body => res.status(200).send(body));
+            .then(body => res.status(200).send(body))
+            .catch(err => {
+                log_err(err);
+                res.status(500).send("server-error");
+            });
             break;
-    
+        case "findpathway":
+            fetch("https://rest.kegg.jp/find/pathway/" + req.params.input)
+            .then(response => response.text())
+            .then(body => res.status(200).send(body))
+            .catch(err => {
+                log_err(err);
+                res.status(500).send("server-error");
+            })
+            break;
+        case "get":
+            fetch("https://rest.kegg.jp/get/" + req.params.input)
+            .then(response => response.text())
+            .then(body => res.status(200).send(body))
+            .catch(err => {
+                log_err(err);
+                res.status(500).send("server-error");
+            });
+            break;
         default:
             break;
     }
@@ -170,3 +185,7 @@ app.listen(PORT, () => {
     console.log("Server started at port " + PORT);
     genes = search("./hugo.txt");
 })
+
+function log_err(err){
+    console.log(err);
+}
