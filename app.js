@@ -35,7 +35,7 @@ app.get("/:redirect", (request, response) => {
         response.status(404).send("Not found.");
 })
 
-app.get("/api/:func/:input", (req, res) => {
+app.get("/api/:func/:input", async (req, res) => {
     switch (req.params.func) {
         case "find":
             fetch("https://rest.kegg.jp/find/compound/" + req.params.input)
@@ -63,6 +63,12 @@ app.get("/api/:func/:input", (req, res) => {
                 log_err(err);
                 res.status(500).send("server-error");
             });
+            break;
+        case "convert":
+            let arr = req.params.input.split("\n");
+            const path = await MetaToPath.create2DPathways(arr);
+            const csv = MetaToPath.arrToCSV(path);
+            res.send(csv);
             break;
         default:
             break;
@@ -186,7 +192,7 @@ const PORT = 80;
 app.listen(PORT, () => {
     console.log("Server started at port " + PORT);
     genes = search("./hugo.txt");
-    test_paths();
+    // test_pat hs();
 })
 
 async function test_paths() {

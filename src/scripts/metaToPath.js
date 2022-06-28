@@ -42,6 +42,10 @@ class MetaToPath {
                 return el.split("map")[1].split("  ")[1];
             })
 
+            for (let i = 0; i < pathways.length; i++) {
+                pathways[i] = pathways[i].replace(/\,/g, "|");
+            }
+
             metabs.push({ input: metabolite, paths: pathways });
         }
 
@@ -86,6 +90,7 @@ class MetaToPath {
         for (let i = 0; i < metabs.length; i++) {
             const meta = metabs[i];
             meta.paths.forEach(path => {
+                path = path.replace(/\,/g, "|");
                 if (!pathways.includes(path))
                     pathways.push(path);
             });
@@ -110,13 +115,13 @@ class MetaToPath {
 
         for (let i = 0; i < metabs.length; i++) {
             const meta = metabs[i];
-            str += "\n" + meta.input;
+            str += "\n" + meta.input + ",";
 
             paths.forEach(path => {
                 if (meta.paths.includes(path)) {
                     str += "1";
                 } else {
-                    str += "0"
+                    str += "0";
                 }
 
                 str += ","

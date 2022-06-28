@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CICEKLAB Tools</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <style>
+        .background {
+            background: url("/img/background.jpg");
+            background-repeat: round;
+            filter:brightness(30%);
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0px;
+            left: 0px;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="nav-holder"></div>
+    <script>
+        // navbar loader
+        var navholder = document.getElementById("nav-holder");
+
+        var req = new XMLHttpRequest();
+        req.open("GET", "nav", true);
+        req.onreadystatechange = function() {
+            if (req.readyState == 4 && req.status == 200) {
+                // load nav
+                navholder.innerHTML = req.responseText;
+            }
+        }
+        req.send();
+    </script>
+
+    <div class="background"></div>
+
+    <div class="d-flex flex-column justify-content-center align-items-center" style="min-height: 100vh !important;">
+        <form class="w-50 mb-2" autocomplete="on" id="main-form">
+            <label for="type-select" class="form-label text-white mt-2">Choose:</label>
+            <select class="form-select" aria-label="Choose" id="type-select">
+                <option value="topathway">Metabolite to Pathway</option>
+                <option value="toprocess">Pathway to Process</option>
+            </select>
+            <label for="molecule" class="form-label text-white">Molecule or Pathway:</label>
+            <textarea id="molecule" type="text" class="form-control" rows="4" placeholder="cpd:C00535&#10;cpd:C00031&#10;C00092"></textarea>
+            
+        </form>
+
+        <button type="button" id="submit" class="btn btn-light">Submit</button>         
+
+        <div hidden id="hidden-div" style="overflow: auto;width: 90%;">
+            <table class="table table-light table-striped table-bordered">
+                <thead>
+                    <tr class="table-light text-center" id="tr">
+                        <!-- <th class="table-light" scope="col">Results</th> -->
+                    </tr>
+                </thead>
+                <tbody id="result-body">
+
+                </tbody>
+            </table>       
+        </div>
+        <a id="download" class="text-white mt-2" hidden>Download</a>
+        <button type="button" id="refresh" class="btn btn-light mt-2" hidden>Again</button>
+    </div>
+
+    <script>
+        var btn = document.getElementById("submit");
+        var textarea = document.getElementById("molecule");
+        var form = document.getElementById("main-form");
+        var hiddendiv = document.getElementById("hidden-div");
+        var download = document.getElementById("download");
+        var refresh = document.getElementById("refresh");
+        var thead = document.getElementById("tr");
+        var tbody = document.getElementById("result-body");
+        var type = document.getElementById("type-select");
+
+        refresh.onclick = function() {
+            location.reload();
+        }
+
+        btn.onclick = function() {
+            var text = textarea.value;
+
+            var req = new XMLHttpRequest();
+            if (type.value == "topathway") 
+                req.open("GET", "/api/convert/" + encodeURIComponent(text));
+            else {
+                alert("not implemented");
+                return;
+            }
+            req.onreadystatechange = function() {
+                if (req.readyState == 4 && req.status == 200) {
+                    var response = req.responseText;
+                    
+                    form.remove();
+                    btn.remove();
+                    hiddendiv.hidden = false;
+                    download.hidden = false;
+                    refresh.hidden = false;
+
+                    download.setAttribute("download", "result.csv");
+                    download.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(response));
+
+                    var lines = response.split("\n");
+                    for (let i = 0; i < lines.length; i++) {
+                        const line = lines[i];
+                        if (i == 0) {
+                            // create thead
+                            const heads = line.split(",");
+                            for (let a = 0; a < heads.length; a++) {
+                                const head = heads[a];
+                                let th = document.createElement("th");
+                                th.classList.add("table-light");
+                                th.scope = "col";
+                                th.innerText = head.replace(/\|/g, ",");
+                                thead.append(th);
+                            }
+                            continue;
+                        }
+
+                        const values = line.split(",");
+                        let tr = document.createElement("tr");
+                        for (let a = 0; a < values.length; a++) {
+                            const val = values[a];
+                            let td = document.createElement("td");
+                            td.innerText = val;
+                            tr.append(td);
+                        }
+                        tbody.append(tr);
+                    }
+                }
+            }
+            req.send();
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+</body>
+</html>
