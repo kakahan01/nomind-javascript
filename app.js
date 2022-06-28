@@ -192,15 +192,7 @@ const PORT = 80;
 app.listen(PORT, () => {
     console.log("Server started at port " + PORT);
     genes = search("./hugo.txt");
-    // test_pat hs();
 })
-
-async function test_paths() {
-    const paths = await MetaToPath.create2DPathways(["cpd:C00535", "cpd:C00031", "C00092"]);
-    const csv = MetaToPath.arrToCSV(paths);
-
-    fs.writeFileSync("./out.txt", csv);
-}
 
 function log_err(err){
     console.log(err);
