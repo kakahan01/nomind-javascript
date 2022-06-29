@@ -14,6 +14,7 @@ var jsonParser = bodyParser.json();
 
 const search = require('./src/scripts/hugoSearch');
 const MetaToPath = require('./src/scripts/metaToPath');
+const PathToProcess = require('./src/scripts/pathToProcess');
 const { response } = require('express');
 const { request } = require('http');
 const { start } = require('repl');
@@ -66,9 +67,31 @@ app.get("/api/:func/:input", async (req, res) => {
             break;
         case "convert":
             let arr = req.params.input.split("\n");
+
+            for (let i = 0; i < arr.length; i++) {
+                const el = arr[i];
+                if (el.trim() == "") {
+                    arr.splice(i,1);
+                }
+            }
+
             const path = await MetaToPath.create2DPathways(arr);
             const csv = MetaToPath.arrToCSV(path);
             res.send(csv);
+            break;
+        case "convert_process":
+            let arr2 = req.params.input.split("\n");
+
+            for (let i = 0; i < arr2.length; i++) {
+                const el = arr2[i];
+                if (el.trim() == "") {
+                    arr2.splice(i,1);
+                }
+            }
+
+            const path2 = await PathToProcess.create2DProcess(arr2);
+            const csv2 = PathToProcess.createCSV(path2);
+            res.send(csv2);
             break;
         default:
             break;

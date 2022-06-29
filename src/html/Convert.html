@@ -26,15 +26,15 @@
         // navbar loader
         var navholder = document.getElementById("nav-holder");
 
-        var req = new XMLHttpRequest();
-        req.open("GET", "nav", true);
-        req.onreadystatechange = function() {
-            if (req.readyState == 4 && req.status == 200) {
+        var _req = new XMLHttpRequest();
+        _req.open("GET", "nav", true);
+        _req.onreadystatechange = function() {
+            if (_req.readyState == 4 && _req.status == 200) {
                 // load nav
-                navholder.innerHTML = req.responseText;
+                navholder.innerHTML = _req.responseText;
             }
         }
-        req.send();
+        _req.send();
     </script>
 
     <div class="background"></div>
@@ -47,7 +47,7 @@
                 <option value="toprocess">Pathway to Process</option>
             </select>
             <label for="molecule" class="form-label text-white">Molecule or Pathway:</label>
-            <textarea id="molecule" type="text" class="form-control" rows="4" placeholder="cpd:C00535&#10;cpd:C00031&#10;C00092"></textarea>
+            <textarea id="molecule" type="text" class="form-control" rows="4" placeholder="cpd:C00535&#10;cpd:C00031&#10;C00092&#10;map00010"></textarea>
             
         </form>
 
@@ -80,6 +80,8 @@
         var tbody = document.getElementById("result-body");
         var type = document.getElementById("type-select");
 
+        var req = null;
+
         refresh.onclick = function() {
             location.reload();
         }
@@ -87,14 +89,63 @@
         btn.onclick = function() {
             var text = textarea.value;
 
-            var req = new XMLHttpRequest();
-            if (type.value == "topathway") 
+            req = new XMLHttpRequest();
+            if (type.value == "topathway") {
                 req.open("GET", "/api/convert/" + encodeURIComponent(text));
-            else {
-                alert("not implemented");
-                return;
+                req.onreadystatechange = handleRequestPathway;
             }
-            req.onreadystatechange = function() {
+            else {
+                req.open("GET", "/api/convert_process/" +  encodeURIComponent(text));
+                req.onreadystatechange = handleRequestProcess;
+                // alert("not implemented");
+            }
+            
+            req.send();
+        }
+
+        function handleRequestProcess() {
+            if (req.readyState == 4 && req.status == 200) {
+                var response = req.responseText;
+
+                form.remove();
+                btn.remove();
+                hiddendiv.hidden = false;
+                download.hidden = false;
+                refresh.hidden = false;
+
+                download.setAttribute("download", "result.csv");
+                download.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(response));
+
+                var lines = response.split("\n");
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i];
+                    if (i == 0) {
+                        // create thead
+                        const heads = line.split(",");
+                        for (let a = 0; a < heads.length; a++) {
+                            const head = heads[a];
+                            let th = document.createElement("th");
+                            th.classList.add("table-light");
+                            th.scope = "col";
+                            th.innerText = head.replace(/\|/g, ",");
+                            thead.append(th);
+                        }
+                        continue;
+                    }
+                    const values = line.split(",");
+                    let tr = document.createElement("tr");
+                    for (let a = 0; a < values.length; a++) {
+                        const val = values[a];
+                        let td = document.createElement("td");
+                        td.innerText = val;
+                        tr.append(td);
+                    }
+                    tbody.append(tr);
+                }
+            }
+        }
+
+        function handleRequestPathway() {
                 if (req.readyState == 4 && req.status == 200) {
                     var response = req.responseText;
                     
@@ -136,8 +187,6 @@
                     }
                 }
             }
-            req.send();
-        }
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
