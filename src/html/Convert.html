@@ -53,7 +53,7 @@
 
         <button type="button" id="submit" class="btn btn-light">Submit</button>         
 
-        <div hidden id="hidden-div" style="overflow: auto;width: 90%;">
+        <div hidden id="hidden-div" style="overflow: auto;width: 90%;max-height: 60vh;">
             <table class="table table-light table-striped table-bordered">
                 <thead>
                     <tr class="table-light text-center" id="tr">
@@ -66,6 +66,7 @@
             </table>       
         </div>
         <a id="download" class="text-white mt-2" hidden>Download</a>
+        <button type="button" id="processbtn" class="btn btn-light mt-2" hidden>Convert to process</button>
         <button type="button" id="refresh" class="btn btn-light mt-2" hidden>Again</button>
     </div>
 
@@ -79,8 +80,28 @@
         var thead = document.getElementById("tr");
         var tbody = document.getElementById("result-body");
         var type = document.getElementById("type-select");
+        var processbtn = document.getElementById("processbtn");
 
         var req = null;
+
+        var names = [];
+
+        processbtn.onclick = function() {
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("GET", "/api/names_to_id/" + encodeURIComponent(names));
+
+            xhttp.onreadystatechange = function() {
+                if (xhttp.readyState == 4 && xhttp.status == 200) {
+                    var response = JSON.parse(xhttp.responseText);
+                    req = new XMLHttpRequest();
+                    req.open("GET", "/api/convert_process/" +  encodeURIComponent(response.join("\n")));
+                    req.onreadystatechange = handleConversion;
+                    req.send();
+                }
+            }
+
+            xhttp.send();
+        }
 
         refresh.onclick = function() {
             location.reload();
@@ -101,6 +122,45 @@
             }
             
             req.send();
+        }
+
+        function handleConversion() {
+            if (req.readyState == 4 && req.status == 200) {
+                thead.innerHTML = "";
+                tbody.innerHTML = "";
+
+                processbtn.hidden = true;
+
+                var response = req.responseText;
+                download.setAttribute("download", "result.csv");
+                download.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(response));
+                var lines = response.split("\n");
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i];
+                    if (i == 0) {
+                        // create thead
+                        const heads = line.split(",");
+                        for (let a = 0; a < heads.length; a++) {
+                            const head = heads[a];
+                            let th = document.createElement("th");
+                            th.classList.add("table-light");
+                            th.scope = "col";
+                            th.innerText = head.replace(/\|/g, ",");
+                            thead.append(th);
+                        }
+                        continue;
+                    }
+                    const values = line.split(",");
+                    let tr = document.createElement("tr");
+                    for (let a = 0; a < values.length; a++) {
+                        const val = values[a];
+                        let td = document.createElement("td");
+                        td.innerText = val;
+                        tr.append(td);
+                    }
+                    tbody.append(tr);
+                }
+            }
         }
 
         function handleRequestProcess() {
@@ -154,6 +214,7 @@
                     hiddendiv.hidden = false;
                     download.hidden = false;
                     refresh.hidden = false;
+                    processbtn.hidden = false;
 
                     download.setAttribute("download", "result.csv");
                     download.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(response));
@@ -169,7 +230,12 @@
                                 let th = document.createElement("th");
                                 th.classList.add("table-light");
                                 th.scope = "col";
-                                th.innerText = head.replace(/\|/g, ",");
+
+                                const name = head.replace(/\|/g, ",");
+                                if (a != 0)
+                                    names.push(name);
+
+                                th.innerText = name;
                                 thead.append(th);
                             }
                             continue;

@@ -20,7 +20,7 @@ class PathToProcess {
                     continue;
                 
                 const className = line.split("       ")[1];
-                processes.push({ input: pathway, process: className.split("; ") });
+                processes.push({ input: pathway, process: [className] });
                 
                 break;
             }
@@ -82,6 +82,25 @@ class PathToProcess {
         str = str.substring(0, str.length - 1);
 
         return str;
+    }
+
+    static async convertNameToID(name_arr) {
+        var ids = [];
+
+        for (let i = 0; i < name_arr.length; i++) {
+            const name = name_arr[i];
+            const response = await fetch("https://rest.kegg.jp/find/pathway/" + name);
+            const body = await response.text();
+
+            if (body.trim() == "") {
+                continue;
+            }
+
+            const id = body.split(":")[1].split("	")[0];
+            ids.push(id);
+        }
+
+        return ids;
     }
 }
 
