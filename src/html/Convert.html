@@ -66,6 +66,7 @@
             </table>       
         </div>
         <a id="download" class="text-white mt-2" hidden>Download</a>
+        <button type="button" id="typebtn" class="btn btn-light mt-2" hidden>Convert to types</button>
         <button type="button" id="processbtn" class="btn btn-light mt-2" hidden>Convert to process</button>
         <button type="button" id="refresh" class="btn btn-light mt-2" hidden>Again</button>
     </div>
@@ -81,10 +82,65 @@
         var tbody = document.getElementById("result-body");
         var type = document.getElementById("type-select");
         var processbtn = document.getElementById("processbtn");
+        var typebtn = document.getElementById("typebtn");
 
         var req = null;
 
         var names = [];
+        var types = [];
+
+        typebtn.onclick = function() {
+            var sectypes = types.map(name => name.split("; ")[1]);
+            var maintypes = types.map(name => name.split("; ")[0]);
+            
+            var lookedmain = [];
+            var lookedsec = [];
+
+            for (let i = 0; i < maintypes.length; i++) {
+                const type = maintypes[i];
+                if (!lookedmain.includes(type))
+                    lookedmain.push(type);
+            }
+
+            for (let i = 0; i < sectypes.length; i++) {
+                const type = sectypes[i];
+                if (!lookedsec.includes(type))
+                lookedsec.push(type);
+            }
+
+            sectypes = lookedsec;
+            maintypes = lookedmain;
+
+
+            thead.innerHTML = "";
+            tbody.innerHTML = "";
+
+            typebtn.hidden = true;
+
+            let th = document.createElement("th");
+            th.classList.add("table-light");
+            th.scope = "col";
+            th.innerText = "Name";
+
+            thead.append(th);
+
+            for (let i = 0; i < maintypes.length; i++) {
+                const maintype = maintypes[i];
+
+                let th = document.createElement("th");
+                th.classList.add("table-light");
+                th.scope = "col";
+                th.innerText = maintype;
+                
+                thead.append(th);
+            }
+
+            for (let i = 0; i < sectypes.length; i++) {
+                const sectype = sectypes[i];
+                let tr = document.createElement("tr");
+                
+            }
+        }
 
         processbtn.onclick = function() {
             var xhttp = new XMLHttpRequest();
@@ -130,6 +186,7 @@
                 tbody.innerHTML = "";
 
                 processbtn.hidden = true;
+                typebtn.hidden = false;
 
                 var response = req.responseText;
                 download.setAttribute("download", "result.csv");
@@ -145,7 +202,10 @@
                             let th = document.createElement("th");
                             th.classList.add("table-light");
                             th.scope = "col";
-                            th.innerText = head.replace(/\|/g, ",");
+                            var name = head.replace(/\|/g, ",");
+                            th.innerText = name;
+                            if (a != 0)
+                                types.push(name);
                             thead.append(th);
                         }
                         continue;
@@ -163,7 +223,7 @@
             }
         }
 
-        function handleRequestProcess() {
+        function handleRequestProcess() {   
             if (req.readyState == 4 && req.status == 200) {
                 var response = req.responseText;
 
@@ -172,6 +232,7 @@
                 hiddendiv.hidden = false;
                 download.hidden = false;
                 refresh.hidden = false;
+                typebtn.hidden = false;
 
                 download.setAttribute("download", "result.csv");
                 download.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(response));
@@ -187,7 +248,12 @@
                             let th = document.createElement("th");
                             th.classList.add("table-light");
                             th.scope = "col";
-                            th.innerText = head.replace(/\|/g, ",");
+                            var name = head.replace(/\|/g, ",");
+                            th.innerText = name;
+
+                            if (a != 0)
+                                types.push(name);
+
                             thead.append(th);
                         }
                         continue;
