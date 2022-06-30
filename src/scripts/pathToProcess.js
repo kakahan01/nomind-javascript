@@ -1,4 +1,5 @@
 var fetch = require('node-fetch');
+const Cache = require('./cache')
 
 class PathToProcess {
     /**
@@ -10,8 +11,7 @@ class PathToProcess {
 
         for (let i = 0; i < input_arr.length; i++) {
             let pathway = input_arr[i].trim();
-            const response = await fetch("https://rest.kegg.jp/get/" + pathway);
-            const body = await response.text();
+            const body = await Cache.get("path", "get", pathway);
 
             var lines = body.split("\n");
             for (let a = 0; a < lines.length; a++) {
@@ -89,8 +89,7 @@ class PathToProcess {
 
         for (let i = 0; i < name_arr.length; i++) {
             const name = name_arr[i];
-            const response = await fetch("https://rest.kegg.jp/find/pathway/" + name);
-            const body = await response.text();
+            const body = await Cache.get("path", "find", name);
 
             if (body.trim() == "") {
                 continue;

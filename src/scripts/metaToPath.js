@@ -1,4 +1,5 @@
 const fetch = require('node-fetch');
+const Cache = require('./cache')
 
 class MetaToPath {
     /**
@@ -14,8 +15,8 @@ class MetaToPath {
             var metabolite = input_arr[i];
             if (!metabolite.startsWith("cpd:"))
                 metabolite = "cpd:" + metabolite;
-            const response = await fetch("https://rest.kegg.jp/get/" + metabolite);
-            const body = await response.text();
+
+            const body = await Cache.get("meta", "get", metabolite);
 
             // extract pathways from body
             var lines = body.split("\n");

@@ -15,6 +15,7 @@ var jsonParser = bodyParser.json();
 const search = require('./src/scripts/hugoSearch');
 const MetaToPath = require('./src/scripts/metaToPath');
 const PathToProcess = require('./src/scripts/pathToProcess');
+const Cache = require('./src/scripts/cache');
 const { response } = require('express');
 const { request } = require('http');
 const { start } = require('repl');
@@ -39,31 +40,16 @@ app.get("/:redirect", (request, response) => {
 app.get("/api/:func/:input", async (req, res) => {
     switch (req.params.func) {
         case "find":
-            fetch("https://rest.kegg.jp/find/compound/" + req.params.input)
-            .then(response => response.text())
-            .then(body => res.status(200).send(body))
-            .catch(err => {
-                log_err(err);
-                res.status(500).send("server-error");
-            });
+            const body = await Cache.get("meta", "find", req.params.input);
+            res.status(200).send(body);
             break;
         case "findpathway":
-            fetch("https://rest.kegg.jp/find/pathway/" + req.params.input)
-            .then(response => response.text())
-            .then(body => res.status(200).send(body))
-            .catch(err => {
-                log_err(err);
-                res.status(500).send("server-error");
-            })
+            const body2 = await Cache.get("path", "find", req.params.input);
+            res.status(200).send(body2);
             break;
         case "get":
-            fetch("https://rest.kegg.jp/get/" + req.params.input)
-            .then(response => response.text())
-            .then(body => res.status(200).send(body))
-            .catch(err => {
-                log_err(err);
-                res.status(500).send("server-error");
-            });
+            const body3 = await Cache.get("meta", "get", req.params.input);
+            res.status(200).send(body3);
             break;
         case "convert":
             let arr = req.params.input.split("\n");
