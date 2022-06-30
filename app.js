@@ -3,27 +3,22 @@ const app = express();
 
 const fetch = require('node-fetch');
 const fs = require('fs');
+const path = require('path')
+const favicon = require('serve-favicon');
+
 
 var bodyParser = require('body-parser');
 var jsonParser = bodyParser.json();
 
-// var favicon = require('serve-favicon');
-// app.use(favicon(__dirname + '/src/img/favicon.ico'));
-
-// app.use('/favicon.ico', express.static('src/img/favicon.ico'));
 
 const search = require('./src/scripts/hugoSearch');
 const MetaToPath = require('./src/scripts/metaToPath');
 const PathToProcess = require('./src/scripts/pathToProcess');
 const Cache = require('./src/scripts/cache');
-const { response } = require('express');
-const { request } = require('http');
-const { start } = require('repl');
-var genes = [];
 
-app.get("/logo", (req, res) => {
-    res.sendFile(__dirname + "/src/img/favicon.png")
-})
+app.use(favicon(path.join('src', 'img', 'mass.jpg')));
+
+var genes = [];
 
 app.get("/", (request, response) => {
     response.redirect("Home");
