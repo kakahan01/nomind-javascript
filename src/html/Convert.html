@@ -124,6 +124,8 @@
 
             thead.append(th);
 
+            var str = "Name,";
+
             for (let i = 0; i < maintypes.length; i++) {
                 const maintype = maintypes[i];
 
@@ -132,14 +134,43 @@
                 th.scope = "col";
                 th.innerText = maintype;
                 
+                str += maintype + ",";
+
                 thead.append(th);
             }
+
+
+            str = str.substring(0, str.length - 1);
+
+            str += "\n";
 
             for (let i = 0; i < sectypes.length; i++) {
                 const sectype = sectypes[i];
                 let tr = document.createElement("tr");
-                
+                var type = types.find(t => t.endsWith(sectype));
+                let name = document.createElement("td");
+                name.innerText = sectype;
+                tr.append(name);
+                str += sectype + ",";
+                for (let a = 0; a < maintypes.length; a++) {
+                    const maintype = maintypes[a];
+                    let td = document.createElement("td");
+                    if (type.startsWith(maintype)) {
+                        td.innerText = "1";
+                        str += "1,";
+                    } else {
+                        td.innerText = "0";
+                        str += "0,";
+                    }
+                    tr.append(td);
+                }
+                tbody.append(tr);
+                str = str.substring(0, str.length - 1);
+                str += "\n";
             }
+
+            download.setAttribute("download", "result.csv");
+            download.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(str));
         }
 
         processbtn.onclick = function() {
