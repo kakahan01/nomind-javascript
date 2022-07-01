@@ -184,6 +184,8 @@
                 tbody.append(tr);
             }
 
+            csv = csv.substring(0, csv.length - 1);
+
             download.setAttribute("download", "result.csv");
             download.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(csv));
         }
