@@ -67,6 +67,7 @@
         </div>
         <a id="download" class="text-white mt-2" hidden>Download</a>
         <button type="button" id="typebtn" class="btn btn-light mt-2" hidden>Convert to types</button>
+        <button type="button" id="classbtn" class="btn btn-light mt-2" hidden>Pathways to main class</button>
         <button type="button" id="processbtn" class="btn btn-light mt-2" hidden>Convert to process</button>
         <button type="button" id="refresh" class="btn btn-light mt-2" hidden>Again</button>
     </div>
@@ -83,13 +84,113 @@
         var type = document.getElementById("type-select");
         var processbtn = document.getElementById("processbtn");
         var typebtn = document.getElementById("typebtn");
+        var classbtn = document.getElementById("classbtn");
 
         var req = null;
 
         var names = [];
         var types = [];
+        var process_response = "";
+
+        classbtn.onclick = function() {
+            // types = top
+            // names = left
+
+            classbtn.hidden = true;
+            typebtn.hidden = true;
+
+            var lines = process_response.split("\n");
+            var top = lines[0].split(",");
+            var paths = lines.slice(1,lines.length);
+
+            var maintypes = [];
+            var newpaths = [];
+
+            var csv = "ID,Name,";
+
+            // calculate maintypes
+            for (let i = 0; i < top.length; i++) {
+                const type = top[i].split(";")[0];
+
+                if (i == 0 || i == 1)
+                    continue;
+
+                if (!maintypes.includes(type))
+                    maintypes.push(type);
+            }
+
+            csv += maintypes.join(",") + "\n";
+
+            for (let a = 0; a < paths.length; a++) {
+                const path = paths[a]
+                const pathsplit = path.split(",");
+                var found = [];
+                var newpath = "";
+                for (let b = 0; b < pathsplit.length; b++) {
+                    const el = pathsplit[b];
+                    if (b == 0 || b == 1) {
+                        newpath += el + ",";
+                        continue;
+                    }
+                    var typesi = b - 2;
+                    if (!found.includes(types[typesi].split(";")[0]) && el == 1) {
+                        found.push(types[typesi].split(";")[0]);
+                    }
+                }
+                for (let b = 0; b < maintypes.length; b++) {
+                    const maintype = maintypes[b];
+                    if (found.includes(maintype)) {
+                        newpath += "1,";
+                    } else {
+                        newpath += "0,";
+                    }
+                }
+                newpath = newpath.substring(0, newpath.length - 1); 
+                newpaths.push(newpath);
+            }
+
+            tbody.innerHTML = "";
+            thead.innerHTML = "";
+
+            for (let i = 0; i < 2; i++) {
+                let th = document.createElement("th");
+                th.classList.add("table-light");
+                th.scope = "col";
+                th.innerText = i == 0 ? "ID" : "Name";
+                thead.append(th);
+            }
+
+            for (let i = 0; i < maintypes.length; i++) {
+                const maintype = maintypes[i];
+                let th = document.createElement("th");
+                th.classList.add("table-light");
+                th.scope = "col";
+                th.innerText = maintype;
+                thead.append(th);
+            }
+
+            for (let i = 0; i < newpaths.length; i++) {
+                const newpath = newpaths[i];
+
+                csv += newpath + "\n";
+
+                let tr = document.createElement("tr");
+                for (let a = 0; a < newpath.split(",").length; a++) {
+                    const el = newpath.split(",")[a];
+                    let td = document.createElement("td");
+                    td.innerText = el;
+                    tr.append(td);
+                }
+                tbody.append(tr);
+            }
+
+            download.setAttribute("download", "result.csv");
+            download.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(csv));
+        }
 
         typebtn.onclick = function() {
+            classbtn.hidden = true;
+
             var sectypes = types.map(name => name.split("; ")[1]);
             var maintypes = types.map(name => name.split("; ")[0]);
             
@@ -218,8 +319,10 @@
 
                 processbtn.hidden = true;
                 typebtn.hidden = false;
+                classbtn.hidden = false;
 
                 var response = req.responseText;
+                process_response = response;
                 download.setAttribute("download", "result.csv");
                 download.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(response));
                 var lines = response.split("\n");
@@ -257,13 +360,14 @@
         function handleRequestProcess() {   
             if (req.readyState == 4 && req.status == 200) {
                 var response = req.responseText;
-
+                process_response = response;
                 form.remove();
                 btn.remove();
                 hiddendiv.hidden = false;
                 download.hidden = false;
                 refresh.hidden = false;
                 typebtn.hidden = false;
+                classbtn.hidden = false;
 
                 download.setAttribute("download", "result.csv");
                 download.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(response));
@@ -305,7 +409,7 @@
         function handleRequestPathway() {
                 if (req.readyState == 4 && req.status == 200) {
                     var response = req.responseText;
-                    
+                    process_response = response;
                     form.remove();
                     btn.remove();
                     hiddendiv.hidden = false;
