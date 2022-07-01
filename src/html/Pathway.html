@@ -50,8 +50,12 @@
             <input type="text" id="molecule" class="form-control" placeholder="Enter name and press Enter.">
         </form>
         
+        <div class="d-flex justify-content-end mb-2" style="width: 80%;">
+            <button type="button" class="btn btn-light" id="converter" hidden>Send list to mass converter</button>
+        </div>
+
         <div id="visible-div" style="display:flex;overflow: auto;max-height: 15rem;flex-direction: column;align-items: center;align-self: center;align-content: center;width: 80%;">
-            <table class="table table-light table-striped table-borderless">
+          <table class="table table-light table-striped table-borderless">
                 <tbody id="table-body">
 
                 </tbody>
@@ -85,9 +89,22 @@
         var refresh = document.getElementById("refresh");
         var download = document.getElementById("download");
         var select = document.getElementById("type-select");
+        var converterbtn = document.getElementById("converter");
 
         var cache = [];
         var _search = "";
+
+        var _list = [];
+
+        converterbtn.onclick = function() {
+            if (_list.length == 0) return alert("List is empty");
+
+            location.href = "/Convert?" + encodeURIComponent(select.value+"||"+_list.join("||"));
+        }
+
+        select.onchange = function() {
+            _list = [];
+        }
 
         refresh.onclick = function() {
             location.reload();
@@ -96,7 +113,7 @@
         form.onsubmit = function(e) {
             e.preventDefault();
 
-            console.log(select.value);
+            converterbtn.hidden = false;
 
             if (select.value == "topathway") {
                 var request = new XMLHttpRequest();
@@ -154,8 +171,36 @@
                 let tr = document.createElement("tr");
                 let td = document.createElement("td");
                 let a = document.createElement("a");
+                let div = document.createElement("div");
+                div.classList.add("float-end");
+                let _btn = document.createElement("button");
+                _btn.classList.add("btn", "btn-light", "border", "border-3");
+                div.append(_btn);
+
+                if (_list.includes(id)) {
+                    _btn.classList.toggle("border-success");
+                    _btn.innerText = "Added";
+                } else {
+                    _btn.innerText = "Add to list";
+                }
+
+                _btn.type = "button";
+
+                _btn.onclick = function() {
+                    _btn.classList.toggle("border-success");
+                    _btn.innerText = _btn.innerText == "Added" ? "Add to list" : "Added";
+                    
+                    
+                    if (!_list.includes(id))
+                        _list.push(id);
+                    else {
+                        _list.splice(_list.indexOf(id), 1);
+                    }
+                }
+
                 tr.append(td);
                 td.append(a);
+                td.append(div);
                 
                 a.innerText = name;
                 a.style = "cursor:pointer;color:blue;";
@@ -219,8 +264,38 @@
                 let tr = document.createElement("tr");
                 let td = document.createElement("td");
                 let a = document.createElement("a");
+                let div = document.createElement("div");
+                div.classList.add("float-end");
+                let _btn = document.createElement("button");
+                _btn.classList.add("btn", "btn-light", "border", "border-3");
+                div.append(_btn);
+
+                let id = compound.split("	")[0];
+
+                if (_list.includes(id)) {
+                    _btn.classList.toggle("border-success");
+                    _btn.innerText = "Added";
+                } else {
+                    _btn.innerText = "Add to list";
+                }
+
+                _btn.type = "button";
+
+                _btn.onclick = function() {
+                    _btn.classList.toggle("border-success");
+                    _btn.innerText = _btn.innerText == "Added" ? "Add to list" : "Added";
+                    
+                    
+                    if (!_list.includes(id))
+                        _list.push(id);
+                    else {
+                        _list.splice(_list.indexOf(id), 1);
+                    }
+                }
+
                 tr.append(td);
                 td.append(a);
+                td.append(div);
                 let split = compound.split("	");
                 split.splice(0,1);
                 a.innerText = split.join("	");

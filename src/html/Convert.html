@@ -92,6 +92,12 @@
         var types = [];
         var process_response = "";
 
+        if (location.search != "") {
+            let params = decodeURIComponent(location.search).substring(1).split("||");
+            type.value = params[0];
+            textarea.value = params.slice(1, params.length).join("\n");
+        }
+
         classbtn.onclick = function() {
             // types = top
             // names = left
