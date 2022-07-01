@@ -23,8 +23,15 @@ class MetaToPath {
             var start_index = 0;
             var end_index = 0;
 
+            var _name = "";
+
             for (let a = 0; a < lines.length; a++) {
                 const line = lines[a];
+
+                if (line.startsWith("NAME")){
+                    _name = line.split("        ")[1].replace(";", "").replace(/\,/g, ";");
+                    continue;
+                }
 
                 if (line.startsWith("PATH")) {
                     start_index = a;
@@ -47,7 +54,7 @@ class MetaToPath {
                 pathways[i] = pathways[i].replace(/\,/g, "|");
             }
 
-            metabs.push({ input: metabolite, paths: pathways });
+            metabs.push({ input: metabolite, name: _name, paths: pathways });
         }
 
 
@@ -106,17 +113,17 @@ class MetaToPath {
     static arrToCSV(metabs) {
         var paths = this.pathways(metabs);
 
-        var str = "Name,";
+        var str = "ID,Name,";
 
         paths.forEach(path => {
-            str += path + ",";
+            str += path.replace(/\,/g, ";") + ",";
         })
 
         str = str.substring(0, str.length - 1);
 
         for (let i = 0; i < metabs.length; i++) {
             const meta = metabs[i];
-            str += "\n" + meta.input + ",";
+            str += "\n" + meta.input + "," + meta.name.replace(/\,/g, ";") + ",";
 
             paths.forEach(path => {
                 if (meta.paths.includes(path)) {

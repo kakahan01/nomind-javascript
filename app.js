@@ -75,7 +75,7 @@ app.get("/api/:func/:input", async (req, res) => {
             res.send(csv2);
             break;
         case "names_to_id":
-            let arr3 = req.params.input.split(",");
+            let arr3 = req.params.input.split("||");
 
             const result = await PathToProcess.convertNameToID(arr3);
             res.send(JSON.stringify(result));

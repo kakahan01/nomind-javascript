@@ -13,14 +13,20 @@ class PathToProcess {
             let pathway = input_arr[i].trim();
             const body = await Cache.get("path", "get", pathway);
 
+            var _name = "";
+
             var lines = body.split("\n");
             for (let a = 0; a < lines.length; a++) {
                 const line = lines[a];
+                if (line.startsWith("NAME")) {
+                    _name = line.split("        ")[1];
+                }
+
                 if (!line.startsWith("CLASS"))
                     continue;
                 
                 const className = line.split("       ")[1];
-                processes.push({ input: pathway, process: [className] });
+                processes.push({ input: pathway, name: _name, process: [className] });
                 
                 break;
             }
@@ -54,7 +60,7 @@ class PathToProcess {
      */
     static createCSV(converted) {
         var processes = this.getProcesses(converted);
-        var str = "Name,";
+        var str = "ID,Name,";
 
         str += processes.join(",");
         str += "\n";
@@ -62,7 +68,7 @@ class PathToProcess {
         for (let i = 0; i < converted.length; i++) {
             const con = converted[i];
 
-            str += con.input + ",";
+            str += con.input + "," + con.name.replace(/\,/g, ";") + ",";
 
             for (let a = 0; a < processes.length; a++) {
                 const process = processes[a];

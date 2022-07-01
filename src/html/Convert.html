@@ -175,7 +175,7 @@
 
         processbtn.onclick = function() {
             var xhttp = new XMLHttpRequest();
-            xhttp.open("GET", "/api/names_to_id/" + encodeURIComponent(names));
+            xhttp.open("GET", "/api/names_to_id/" + encodeURIComponent(names.join("||")));
 
             xhttp.onreadystatechange = function() {
                 if (xhttp.readyState == 4 && xhttp.status == 200) {
@@ -235,7 +235,7 @@
                             th.scope = "col";
                             var name = head.replace(/\|/g, ",");
                             th.innerText = name;
-                            if (a != 0)
+                            if (a != 0 && a != 1)
                                 types.push(name);
                             thead.append(th);
                         }
@@ -282,7 +282,7 @@
                             var name = head.replace(/\|/g, ",");
                             th.innerText = name;
 
-                            if (a != 0)
+                            if (a != 0 && a != 1)
                                 types.push(name);
 
                             thead.append(th);
@@ -329,7 +329,7 @@
                                 th.scope = "col";
 
                                 const name = head.replace(/\|/g, ",");
-                                if (a != 0)
+                                if (a != 0 && a != 1)
                                     names.push(name);
 
                                 th.innerText = name;
