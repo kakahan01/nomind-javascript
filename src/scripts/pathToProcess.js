@@ -9,14 +9,10 @@ class PathToProcess {
      */
     static async create2DProcess(input_arr) {
         var processes = [];
-        console.log("input_arr", input_arr.length);
-        var notfound = 0;
         for (let i = 0; i < input_arr.length; i++) {
-            console.log("path", i,"/",input_arr.length);
             let pathway = input_arr[i].trim();
             if (pathway.startsWith("not found")) {
                 processes.push({ input: pathway, name: "not found", process: "unknown" });
-                notfound++;
                 continue;
             }
             const body = await Cache.get("path", "get", pathway.replace(/\-/g, " ").replace(/\//g, " "));
@@ -44,8 +40,6 @@ class PathToProcess {
                 processes.push({ input: pathway, name: _name, process: "unknown" });
             }
         }
-        console.log("notfound", notfound);
-        console.log("processes", processes.length);
         return processes;
     }
 
@@ -76,7 +70,6 @@ class PathToProcess {
         str += processes.join(",");
         str += "\n";
 
-        console.log("converted", converted);
         for (let i = 0; i < converted.length; i++) {
             const con = converted[i];
 
@@ -105,7 +98,6 @@ class PathToProcess {
     static async convertNameToID(name_arr) {
         var ids = [];
         for (let i = 0; i < name_arr.length; i++) {
-            console.log("name_to_id", i, "/", name_arr.length);
             const name = name_arr[i];
             const body = await Cache.get("path", "find", name.replace(/\-/g, " ").replace(/\//g, " "));
 
@@ -113,9 +105,7 @@ class PathToProcess {
 
                 ids.push("not found: " + name);
                 console.log("not found", name);
-                console.log(body);
                 console.log("replaced", name.replace(/\-/g, "").replace(/\//g, " "))
-                console.log(body);
                 continue;
             }
 
