@@ -58,7 +58,7 @@ class PathToProcess {
 
         for (let i = 0; i < process_arr.length; i++) {
             const pro = process_arr[i].process;
-            if (!processes.includes(pro))
+            if (!processes.includes(pro) && pro != "unknown")
                 processes.push(pro);
         }
 
