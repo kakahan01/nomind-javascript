@@ -94,7 +94,7 @@ class PathToProcess {
 
     static async convertNameToID(name_arr) {
         var ids = [];
-
+        console.log("name_arr",name_arr.length);
         for (let i = 0; i < name_arr.length; i++) {
             const name = name_arr[i];
             const body = await Cache.get("path", "find", name);
@@ -107,7 +107,7 @@ class PathToProcess {
             const id = body.split(":")[1].split("	")[0];
             ids.push(id);
         }
-
+        console.log("ids",ids.length);
         return ids;
     }
 }
