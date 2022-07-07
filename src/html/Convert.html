@@ -96,12 +96,7 @@
         var types = [];
         var process_response = "";
 
-        if (location.search != "") {
-            let params = decodeURIComponent(location.search).substring(1).split("||");
-            type.value = params[0];
-            textarea.value = params.slice(1, params.length).join("\n");
-            btn.click();
-        }
+        
 
         classbtn.onclick = function() {
             // types = top
@@ -308,7 +303,7 @@
         }
 
         refresh.onclick = function() {
-            location.reload();
+            location.href = "/Convert";
         }
 
         btn.onclick = function() {
@@ -480,6 +475,13 @@
                         tbody.append(tr);
                     }
                 }
+            }
+
+            if (location.search != "") {
+            let params = decodeURIComponent(location.search).substring(1).split("||");
+            type.value = params[0];
+            textarea.value = params.slice(1, params.length).join("\n");
+            btn.click();
             }
     </script>
 
