@@ -13,7 +13,7 @@ class PathToProcess {
         for (let i = 0; i < input_arr.length; i++) {
             let pathway = input_arr[i].trim();
             if (pathway.startsWith("not found")) {
-                processes.push({ input: pathway, name: _name, process: pathway });
+                processes.push({ input: pathway, name: "not found", process: "unknown" });
                 continue;
             }
             const body = await Cache.get("path", "get", pathway);
