@@ -67,6 +67,8 @@ class PathToProcess {
         str += processes.join(",");
         str += "\n";
 
+        console.log("converted", converted.length);
+
         for (let i = 0; i < converted.length; i++) {
             const con = converted[i];
 
