@@ -109,6 +109,9 @@ class PathToProcess {
 
             if (body.trim() == "") {
                 ids.push("not found: " + name);
+                console.log("not found", name);
+                console.log("replaced", name.replace(/\-/g, ""))
+                console.log(body);
                 continue;
             }
 
