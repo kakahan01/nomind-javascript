@@ -287,6 +287,8 @@
         }
 
         processbtn.onclick = function() {
+            processbtn.disabled = true;
+            processbtn.innerText = "Loading.. This might take a while. Do not panic.";
             var xhttp = new XMLHttpRequest();
             xhttp.open("GET", "/api/names_to_id/" + encodeURIComponent(names.join("|-|")));
 
@@ -309,6 +311,8 @@
         }
 
         btn.onclick = function() {
+            btn.disabled = true;
+            btn.innerText = "Loading.. This might take a while. Do not panic.";
             var text = textarea.value;
 
             req = new XMLHttpRequest();

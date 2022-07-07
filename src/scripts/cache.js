@@ -18,7 +18,7 @@ class Cache {
             this.cache_path = { get: [], find: [] };
         }
 
-        setInterval(this.save_cache, 10*60*1000)
+        setInterval(this.save_cache, 5*60*1000)
     }
 
 

@@ -41,7 +41,7 @@ class PathToProcess {
             }
 
             if (!pushed) {
-                processes.push({ input: pathway, name: "not found", process: "unknown" });
+                processes.push({ input: pathway, name: _name, process: "unknown" });
             }
         }
         console.log("notfound", notfound);
@@ -76,7 +76,7 @@ class PathToProcess {
         str += processes.join(",");
         str += "\n";
 
-
+        console.log("converted", converted);
         for (let i = 0; i < converted.length; i++) {
             const con = converted[i];
 
@@ -84,7 +84,7 @@ class PathToProcess {
 
             for (let a = 0; a < processes.length; a++) {
                 const process = processes[a];
-                if (con.process.includes(process)) {
+                if (con.process.includes(process) && !con.name.startsWith("not found") && !con.process.startsWith("unknown")) {
                     str += "1"
                 } else {
                     str += "0"
