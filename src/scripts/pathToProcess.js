@@ -1,3 +1,4 @@
+const { path } = require('express/lib/application');
 var fetch = require('node-fetch');
 const Cache = require('./cache')
 
@@ -11,6 +12,10 @@ class PathToProcess {
 
         for (let i = 0; i < input_arr.length; i++) {
             let pathway = input_arr[i].trim();
+            if (pathway.startsWith("not found")) {
+                processes.push({ input: pathway, name: _name, process: pathway });
+                continue;
+            }
             const body = await Cache.get("path", "get", pathway);
 
             var _name = "";
@@ -95,6 +100,7 @@ class PathToProcess {
             const body = await Cache.get("path", "find", name);
 
             if (body.trim() == "") {
+                ids.push("not found: " + name);
                 continue;
             }
 
