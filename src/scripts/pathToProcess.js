@@ -18,7 +18,7 @@ class PathToProcess {
                 notfound++;
                 continue;
             }
-            const body = await Cache.get("path", "get", pathway);
+            const body = await Cache.get("path", "get", pathway.replace(/\-/g, ""));
 
             var _name = "";
 
@@ -105,7 +105,7 @@ class PathToProcess {
         var ids = [];
         for (let i = 0; i < name_arr.length; i++) {
             const name = name_arr[i];
-            const body = await Cache.get("path", "find", name);
+            const body = await Cache.get("path", "find", name.replace(/\-/g, ""));
 
             if (body.trim() == "") {
                 ids.push("not found: " + name);
