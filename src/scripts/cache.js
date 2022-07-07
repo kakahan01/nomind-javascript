@@ -59,6 +59,23 @@ class Cache {
      * @param {String} type Meta,Path
      * @param {String} request Find,Get
      * @param {String} name Name
+     */
+    static async get_nocache(type, requst, name) {
+        const url = this.url(type, request, name);
+        const body = await this.request(url);
+        if (type == "meta") {
+            this.cache_meta[request].push({ name: name, response: body, added: Date.now() });
+        } else if (type == "path") {
+            this.cache_path[request].push({ name: name, response: body, added: Date.now() });
+        }
+        return body;
+    }
+
+    /**
+     * 
+     * @param {String} type Meta,Path
+     * @param {String} request Find,Get
+     * @param {String} name Name
      * @returns {String}
      */
     static url(type, request, name) {

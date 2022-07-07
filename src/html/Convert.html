@@ -288,12 +288,13 @@
 
         processbtn.onclick = function() {
             var xhttp = new XMLHttpRequest();
-            xhttp.open("GET", "/api/names_to_id/" + encodeURIComponent(names.join("||")));
+            xhttp.open("GET", "/api/names_to_id/" + encodeURIComponent(names.join("|-|")));
 
             xhttp.onreadystatechange = function() {
                 if (xhttp.readyState == 4 && xhttp.status == 200) {
                     var response = JSON.parse(xhttp.responseText);
                     req = new XMLHttpRequest();
+
                     req.open("GET", "/api/convert_process/" +  encodeURIComponent(response.join("\n")));
                     req.onreadystatechange = handleConversion;
                     req.send();
