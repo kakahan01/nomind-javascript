@@ -100,6 +100,7 @@
             let params = decodeURIComponent(location.search).substring(1).split("||");
             type.value = params[0];
             textarea.value = params.slice(1, params.length).join("\n");
+            btn.click();
         }
 
         classbtn.onclick = function() {
