@@ -105,12 +105,15 @@ class PathToProcess {
     static async convertNameToID(name_arr) {
         var ids = [];
         for (let i = 0; i < name_arr.length; i++) {
+            console.log("name_to_id", i, "/", name_arr.length);
             const name = name_arr[i];
             const body = await Cache.get("path", "find", name.replace(/\-/g, " "));
 
             if (body.trim() == "") {
+
                 ids.push("not found: " + name);
                 console.log("not found", name);
+                console.log(body);
                 console.log("replaced", name.replace(/\-/g, ""))
                 console.log(body);
                 continue;
