@@ -352,10 +352,16 @@
                             th.classList.add("table-light");
                             th.scope = "col";
                             var name = head.replace(/\|\|/g, ",");
+
                             th.innerText = name;
-                            if (a != 0 && a != 1)
+                            
+                            if (name != "unknown") {
+                                if (a != 0 && a != 1)
                                 types.push(name);
-                            thead.append(th);
+                                
+                                thead.append(th);
+                            }
+                            
                         }
                         continue;
                     }
