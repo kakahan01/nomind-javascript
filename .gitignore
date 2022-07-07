@@ -1,10 +1,2 @@
-/static
-
-file.csv 
-
-genefinder.db
-symbol.db
-
-hugo.txt
-
 /node_modules
+package-lock.json

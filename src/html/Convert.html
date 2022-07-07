@@ -325,6 +325,7 @@
         }
 
         function handleConversion() {
+            // process btn
             if (req.readyState == 4 && req.status == 200) {
                 thead.innerHTML = "";
                 tbody.innerHTML = "";
@@ -335,6 +336,7 @@
 
                 var response = req.responseText;
                 process_response = response;
+                
                 download.setAttribute("download", "result.csv");
                 download.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(response));
                 var lines = response.split("\n");
@@ -348,7 +350,7 @@
                             let th = document.createElement("th");
                             th.classList.add("table-light");
                             th.scope = "col";
-                            var name = head.replace(/\|/g, ",");
+                            var name = head.replace(/\|\|/g, ",");
                             th.innerText = name;
                             if (a != 0 && a != 1)
                                 types.push(name);

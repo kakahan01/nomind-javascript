@@ -79,7 +79,6 @@ app.get("/api/:func/:input", async (req, res) => {
 
             const result = await PathToProcess.convertNameToID(arr3);
             res.send(JSON.stringify(result));
-
             break;
         default:
             break;

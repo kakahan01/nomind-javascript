@@ -26,7 +26,7 @@ class PathToProcess {
                     continue;
                 
                 const className = line.split("       ")[1];
-                processes.push({ input: pathway, name: _name, process: [className] });
+                processes.push({ input: pathway, name: _name, process: className.replace(/\,/g, "||") });
                 
                 break;
             }
@@ -43,12 +43,9 @@ class PathToProcess {
         var processes = [];
 
         for (let i = 0; i < process_arr.length; i++) {
-            const process = process_arr[i];
-            for (let a = 0; a < process.process.length; a++) {
-                const pro = process.process[a];
-                if (!processes.includes(pro))
-                    processes.push(pro);
-            }
+            const pro = process_arr[i].process;
+            if (!processes.includes(pro))
+                processes.push(pro);
         }
 
         return processes;
