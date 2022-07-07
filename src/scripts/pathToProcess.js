@@ -13,7 +13,7 @@ class PathToProcess {
         for (let i = 0; i < input_arr.length; i++) {
             let pathway = input_arr[i].trim();
             if (pathway.startsWith("not found")) {
-                processes.push({ input: pathway, name: "not found", process: "" });
+                processes.push({ input: pathway, name: "not found", process: "unknown" });
                 continue;
             }
             const body = await Cache.get("path", "get", pathway);
@@ -49,7 +49,7 @@ class PathToProcess {
 
         for (let i = 0; i < process_arr.length; i++) {
             const pro = process_arr[i].process;
-            if (!processes.includes(pro))
+            if (!processes.includes(pro) && pro != "unknown")
                 processes.push(pro);
         }
 
