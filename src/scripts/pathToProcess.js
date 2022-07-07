@@ -10,10 +10,12 @@ class PathToProcess {
     static async create2DProcess(input_arr) {
         var processes = [];
         console.log("input_arr", input_arr.length);
+        var notfound = 0;
         for (let i = 0; i < input_arr.length; i++) {
             let pathway = input_arr[i].trim();
             if (pathway.startsWith("not found")) {
                 processes.push({ input: pathway, name: "not found", process: "unknown" });
+                notfound++;
                 continue;
             }
             const body = await Cache.get("path", "get", pathway);
@@ -21,6 +23,7 @@ class PathToProcess {
             var _name = "";
 
             var lines = body.split("\n");
+            var pushed = false;
             for (let a = 0; a < lines.length; a++) {
                 const line = lines[a];
                 if (line.startsWith("NAME")) {
@@ -32,10 +35,15 @@ class PathToProcess {
                 
                 const className = line.split("       ")[1];
                 processes.push({ input: pathway, name: _name, process: className.replace(/\,/g, "||") });
-                
+                pushed = true;
                 break;
             }
+
+            if (!pushed) {
+                processes.push({ input: pathway, name: "not found", process: "unknown" });
+            }
         }
+        console.log("notfound", notfound);
         console.log("processes", processes.length);
         return processes;
     }
