@@ -9,7 +9,7 @@ class PathToProcess {
      */
     static async create2DProcess(input_arr) {
         var processes = [];
-
+        console.log("input_arr", input_arr.length);
         for (let i = 0; i < input_arr.length; i++) {
             let pathway = input_arr[i].trim();
             if (pathway.startsWith("not found")) {
@@ -36,7 +36,7 @@ class PathToProcess {
                 break;
             }
         }
-
+        console.log("processes", processes.length);
         return processes;
     }
 
@@ -49,7 +49,7 @@ class PathToProcess {
 
         for (let i = 0; i < process_arr.length; i++) {
             const pro = process_arr[i].process;
-            if (!processes.includes(pro) && pro != "unknown")
+            if (!processes.includes(pro))
                 processes.push(pro);
         }
 
@@ -67,7 +67,6 @@ class PathToProcess {
         str += processes.join(",");
         str += "\n";
 
-        console.log("converted", converted.length);
 
         for (let i = 0; i < converted.length; i++) {
             const con = converted[i];
