@@ -194,11 +194,11 @@ app.post("/submit_genes", jsonParser, (req, res) => {
         }
     }
 
-    res.status = 5000;
+    res.status = 200;
     res.send(JSON.stringify(found));
 });
 
-const PORT = 80;
+const PORT = 5000;
 
 app.listen(PORT, () => {
     console.log("Server started at port " + PORT);
