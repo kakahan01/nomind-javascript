@@ -12,6 +12,7 @@ class PathToProcess {
         console.log("input_arr", input_arr.length);
         var notfound = 0;
         for (let i = 0; i < input_arr.length; i++) {
+            console.log("path", i,"/",input_arr.length);
             let pathway = input_arr[i].trim();
             if (pathway.startsWith("not found")) {
                 processes.push({ input: pathway, name: "not found", process: "unknown" });

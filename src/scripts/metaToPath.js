@@ -12,6 +12,7 @@ class MetaToPath {
         var metabs = [];
 
         for (let i = 0; i < input_arr.length; i++) {
+            console.log("meta", i,"/",input_arr.length);
             var metabolite = input_arr[i];
             if (!metabolite.startsWith("cpd:"))
                 metabolite = "cpd:" + metabolite;
