@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CICEKLAB Tools</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap" rel="stylesheet">
+    <style>
+        body,h1,h2,h3,h4,h5,h6,p,span,a {
+            font-family: 'Source Sans Pro', sans-serif;
+        }
+    </style>
     <style>
         .background {
             background: url("/img/background.jpg");
@@ -478,10 +486,10 @@
             }
 
             if (location.search != "") {
-            let params = decodeURIComponent(location.search).substring(1).split("||");
-            type.value = params[0];
-            textarea.value = params.slice(1, params.length).join("\n");
-            btn.click();
+                let params = decodeURIComponent(location.search).substring(1).split("||");
+                type.value = params[0];
+                textarea.value = params.slice(1, params.length).join("\n");
+                btn.click();
             }
     </script>
 
